@@ -281,26 +281,34 @@ public class ContactsServicePlugin implements MethodCallHandler, FlutterPlugin, 
         return true;
       }
 
-      if (requestCode == REQUEST_OPEN_CONTACT_PICKER) {
-        if (resultCode == RESULT_CANCELED) {
-          finishWithResult(FORM_OPERATION_CANCELED);
-          return true;
-        }
-        Uri contactUri = intent.getData();
-          if (intent != null){
-        Cursor cursor = contentResolver.query(contactUri, null, null, null, null);
-        if (cursor.moveToFirst()) {
-          String id = contactUri.getLastPathSegment();
-          getContacts("openDeviceContactPicker", id, false, false, false, localizedLabels, this.result);
-        } else {
-          Log.e(LOG_TAG, "onActivityResult - cursor.moveToFirst() returns false");
-          finishWithResult(FORM_OPERATION_CANCELED);
-        }}else{return true;}
-        cursor.close();
-        return true;
-      }
 
-      finishWithResult(FORM_COULD_NOT_BE_OPEN);
+      if (requestCode == REQUEST_OPEN_CONTACT_PICKER) {
+                if (resultCode == RESULT_CANCELED) {
+                    finishWithResult(FORM_OPERATION_CANCELED);
+                    return true;
+                }
+                Uri contactUri = intent.getData();
+                Cursor cursor;
+                if (intent != null) {
+
+                    cursor = contentResolver.query(contactUri, null, null, null, null);
+                    if (cursor.moveToFirst()) {
+                        String id = contactUri.getLastPathSegment();
+                        getContacts("openDeviceContactPicker", id, false, false, false, localizedLabels, this.result);
+                    } else {
+                        Log.e(LOG_TAG, "onActivityResult - cursor.moveToFirst() returns false");
+                        finishWithResult(FORM_OPERATION_CANCELED);
+                    }
+                } else {
+                    return true;
+                }
+                if (cursor != null) {
+                    cursor.close();
+                }
+                return true;
+            }
+
+      
       return false;
     }
 
